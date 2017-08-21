@@ -35,7 +35,7 @@ services:
         max_failure_ratio: 0.3
     stop_grace_period: 30s
     ports:
-      - 1883:1883 # MQTT
+      - 1884:1883 # MQTT
 #      - 8080:8080 # MQTT WebSockets
 #      - 8888:8888 # HTTP
     image: chrisns/emq:v2.3-beta.3-hacked
