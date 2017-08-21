@@ -1,0 +1,56 @@
+version: "3"
+services:
+  mqtt:
+    networks:
+      proxy:
+      mqtt:
+      default:
+        aliases:
+          - mymqtt
+    deploy:
+      replicas: 4
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=emqtt.p.cns.me
+        - com.df.servicePath=/
+        - com.df.port=8083
+        - com.df.httpsOnly=true
+        - com.df.xForwardedProto=true
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 96M
+      restart_policy:
+        condition: any
+        delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: pause
+        monitor: 30s
+        max_failure_ratio: 0.3
+    stop_grace_period: 30s
+    ports:
+      - 1883:1883 # MQTT
+#      - 8080:8080 # MQTT WebSockets
+#      - 8888:8888 # HTTP
+    image: chrisns/emq:v2.3-beta.3-hacked
+    environment:
+      - EMQ_CLUSTER__DNS__NAME=tasks.mymqtt
+      - EMQ_NAME=emq
+      - EMQ_CLUSTER__DISCOVERY=dns
+      - EMQ_CLUSTER__AUTOHEAL=on
+      - EMQ_CLUSTER__AUTOCLEAN=30s
+      - EMQ_CLUSTER__DNS__APP=emq
+
+networks:
+  default:
+    external: false
+  mqtt:
+    external: true
+  proxy:
+    external: true
